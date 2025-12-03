@@ -1,0 +1,41 @@
+# 测试环境配置文件
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    
+  h2:
+    console:
+      enabled: true
+      
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/**/*.xml
+  
+# JWT配置（测试环境）
+jwt:
+  secret: test-secret-key-for-health-management-system
+  expiration: 3600000
+  
+# Coze AI配置（测试环境 - 使用Mock）
+coze:
+  food:
+    api:
+      token: test-token
+      bot-id: test-bot-id
+      url: https://api.coze.cn/v3/chat
+      file-upload-url: https://api.coze.cn/v1/files/upload
+
+# 日志配置
+logging:
+  level:
+    com.health.management: DEBUG
+    org.springframework: INFO
