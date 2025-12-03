@@ -232,14 +232,17 @@ public class AuthServiceImpl implements AuthService {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        
+
         Long userId = jwtUtil.getUserIdFromToken(token);
         String role = jwtUtil.getRoleFromToken(token);
-        
+        boolean isValid = jwtUtil.validateToken(token);
+        if (!isValid) {
+            return Result.error(401, "Token无效");
+        }
         if (userId == null) {
             return Result.error("Token无效");
         }
-        
+
         if ("ADMIN".equals(role)) {
             AdminUser admin = adminUserMapper.selectById(userId);
             if (admin == null) {
@@ -254,7 +257,7 @@ public class AuthServiceImpl implements AuthService {
             return Result.success(getStudentUserInfo(user));
         }
     }
-    
+
     /**
      * 获取学生用户信息(不包含密码)
      */
