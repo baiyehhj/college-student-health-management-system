@@ -1,0 +1,51 @@
+{
+  "name": "student-health-management-frontend",
+  "version": "1.0.0",
+  "description": "大学生健康管理系统前端",
+  "author": "Your Name",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "vue": "^2.6.14",
+    "vue-router": "^3.5.3",
+    "vuex": "^3.6.2",
+    "axios": "^1.4.0",
+    "element-ui": "^2.15.13",
+    "echarts": "^5.4.2",
+    "dayjs": "^1.11.9"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.7.1",
+    "sass": "^1.63.6",
+    "sass-loader": "^10.4.1",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
