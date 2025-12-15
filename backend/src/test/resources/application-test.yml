@@ -1,41 +1,62 @@
-# 测试环境配置文件
 spring:
+  # 数据源核心配置
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:health_management_test;MODE=MySQL;DATABASE_TO_UPPER=FALSE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
-    password: 
-    
+    password: "" # 显式声明空密码，避免潜在解析问题
+  # SQL脚本初始化配置
+  sql:
+    init:
+      mode: always # 强制每次启动执行schema脚本
+      schema-locations: classpath:schema-test-h2.sql # 自定义schema脚本路径
+      # 可选：若有测试数据脚本，添加data-locations
+      # data-locations: classpath:data-test-h2.sql
+  # JPA配置（修正层级错误）
+  jpa:
+    hibernate:
+      ddl-auto: none # 禁用JPA自动建表，确保使用自定义schema脚本
+    # 可选：添加H2方言，避免JPA警告
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  # H2控制台配置
   h2:
     console:
       enabled: true
-      
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
-    
-# MyBatis Plus配置
+      path: /h2-console
+
+coze:
+  api:
+    url: https://api.coze.cn/v3/chat
+    key: pat_DJx0hL6TQxlKV6faPCZ9jhl3wfzoV88U4TxUTJ1CSn9Ca7IDP7JtxPLimR1EqNE5
+    model: 7569554814154801206
+
+# MyBatis Plus配置（优化日志实现）
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath*:mapper/**/*.xml
-  
-# JWT配置（测试环境）
-jwt:
-  secret: test-secret-key-for-health-management-system
-  expiration: 3600000
-  
-# Coze AI配置（测试环境 - 使用Mock）
-coze:
-  food:
-    api:
-      token: test-token
-      bot-id: test-bot-id
-      url: https://api.coze.cn/v3/chat
-      file-upload-url: https://api.coze.cn/v1/files/upload
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl # 适配Spring日志体系
+    map-underscore-to-camel-case: true # 开启下划线转驼峰（默认开启，显式声明更清晰）
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  # 可选：指定Mapper文件路径，避免扫描不到
+  mapper-locations: classpath:mapper/**/*.xml
 
-# 日志配置
+# JWT配置
+jwt:
+  secret: test-secret-key-for-integration-tests-health-management-system-2025
+  expiration: 3600000
+
+# 日志配置（优化：降低无关日志级别，聚焦核心）
 logging:
   level:
-    com.health.management: DEBUG
-    org.springframework: INFO
+    com.health.management: DEBUG # 业务代码日志
+    org.mybatis: DEBUG # MyBatis SQL日志
+    org.springframework.jdbc: DEBUG # JDBC执行日志
+    org.springframework.web: INFO # Web层日志降为INFO，减少冗余
+    org.springframework.sql.init: DEBUG # 新增：打印SQL脚本执行日志，便于排查
+  # 可选：配置日志输出格式，更易读
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
