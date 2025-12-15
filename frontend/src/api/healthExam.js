@@ -52,7 +52,8 @@ export function getLatestHealthExamination() {
 export function downloadTemplate() {
   return request({
     url: '/health-exam/template',
-    method: 'get'
+    method: 'get',
+    responseType: 'blob'
   })
 }
 
