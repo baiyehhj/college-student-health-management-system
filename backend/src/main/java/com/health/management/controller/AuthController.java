@@ -40,7 +40,11 @@ public class AuthController {
      * 登出
      */
     @PostMapping("/logout")
-    public Result logout(@RequestHeader("Authorization") String token) {
+    public Result logout(@RequestHeader(value = "Authorization", required = false) String token) {
+        // 可选：添加token校验逻辑
+        if (token == null || token.trim().isEmpty()) {
+            return Result.error("登出失败，缺少令牌");
+        }
         return Result.success("登出成功");
     }
     

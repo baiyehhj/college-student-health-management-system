@@ -25,6 +25,17 @@ public class DietRecordServiceImpl implements DietRecordService {
     
     @Override
     public Result addRecord(Long studentId, DietRecordRequest request) {
+        // 修复：添加必填字段验证
+        if (request.getRecordDate() == null) {
+            return Result.error("记录日期不能为空");
+        }
+        if (request.getMealType() == null) {
+            return Result.error("用餐类型不能为空");
+        }
+        if (request.getFoodName() == null || request.getFoodName().trim().isEmpty()) {
+            return Result.error("食物名称不能为空");
+        }
+        
         DietRecord record = new DietRecord();
         BeanUtils.copyProperties(request, record);
         record.setStudentId(studentId);

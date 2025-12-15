@@ -23,19 +23,30 @@ public class SleepRecordServiceImpl implements SleepRecordService {
     
     @Autowired
     private SleepRecordMapper sleepRecordMapper;
-    
+
+
     @Override
     public Result addRecord(Long studentId, SleepRecordRequest request) {
+        if (request.getRecordDate() == null) {
+            return Result.error("记录日期不能为空");
+        }
+        if (request.getSleepTime() == null) {
+            return Result.error("入睡时间不能为空");
+        }
+        if (request.getWakeTime() == null) {
+            return Result.error("起床时间不能为空");
+        }
+
         SleepRecord record = new SleepRecord();
         BeanUtils.copyProperties(request, record);
         record.setStudentId(studentId);
-        
+
         // 计算睡眠时长
         if (request.getSleepTime() != null && request.getWakeTime() != null) {
             Duration duration = Duration.between(request.getSleepTime(), request.getWakeTime());
             record.setDuration(BigDecimal.valueOf(duration.toMinutes() / 60.0));
         }
-        
+
         sleepRecordMapper.insert(record);
         return Result.success("添加成功", record);
     }

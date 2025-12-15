@@ -25,6 +25,20 @@ public class MoodRecordServiceImpl implements MoodRecordService {
     
     @Override
     public Result addRecord(Long studentId, MoodRecordRequest request) {
+        // 修复：添加必填字段验证
+        if (request.getRecordDate() == null) {
+            return Result.error("记录日期不能为空");
+        }
+        if (request.getMoodType() == null) {
+            return Result.error("情绪类型不能为空");
+        }
+        if (request.getMoodScore() == null) {
+            return Result.error("情绪评分不能为空");
+        }
+        if (request.getMoodScore() < 1 || request.getMoodScore() > 10) {
+            return Result.error("情绪评分必须在1-10之间");
+        }
+        
         MoodRecord record = new MoodRecord();
         BeanUtils.copyProperties(request, record);
         record.setStudentId(studentId);

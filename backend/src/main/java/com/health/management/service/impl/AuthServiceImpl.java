@@ -1,7 +1,9 @@
 package com.health.management.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.health.management.common.Result;
+import com.health.management.config.PasswordEncoderConfig;
 import com.health.management.dto.LoginRequest;
 import com.health.management.dto.RegisterRequest;
 import com.health.management.entity.AdminEmployeeList;
@@ -14,7 +16,6 @@ import com.health.management.service.AuthService;
 import com.health.management.util.JwtUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +39,10 @@ public class AuthServiceImpl implements AuthService {
     
     @Autowired
     private JwtUtil jwtUtil;
-    
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Autowired
+    private PasswordEncoderConfig.PasswordEncoder passwordEncoder;
+
     
     @Override
     @Transactional
@@ -141,8 +144,16 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
     public Result login(LoginRequest request) {
+        if (request == null) {
+            return Result.error(400, "请求参数不能为空");
+        }
+
         String role = request.getRole();
-        
+        // 校验角色非空
+        if (StringUtils.isEmpty(role)) {
+            return Result.error(400, "角色不能为空");
+        }
+
         if ("ADMIN".equals(role)) {
             return loginAdmin(request);
         } else {
@@ -162,20 +173,22 @@ public class AuthServiceImpl implements AuthService {
         QueryWrapper<StudentUser> wrapper = new QueryWrapper<>();
         wrapper.eq("student_no", request.getStudentNo());
         StudentUser user = studentUserMapper.selectOne(wrapper);
+
         
         if (user == null) {
             return Result.error("学号或密码错误");
         }
-        
-        // 验证密码
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return Result.error("学号或密码错误");
-        }
-        
+
         // 检查账号状态
         if (user.getStatus() == 0) {
             return Result.error("账号已被禁用");
         }
+
+        // 验证密码
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return Result.error("学号或密码错误");
+        }
+
         
         // 生成Token
         String token = jwtUtil.generateToken(user.getId(), user.getStudentNo(), "STUDENT");
@@ -200,19 +213,20 @@ public class AuthServiceImpl implements AuthService {
         QueryWrapper<AdminUser> wrapper = new QueryWrapper<>();
         wrapper.eq("employee_no", request.getEmployeeNo());
         AdminUser admin = adminUserMapper.selectOne(wrapper);
-        
+
+
         if (admin == null) {
             return Result.error("工号或密码错误");
+        }
+
+        // 检查账号状态
+        if (admin.getStatus() == 0) {
+            return Result.error("账号已被禁用");
         }
         
         // 验证密码
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             return Result.error("工号或密码错误");
-        }
-        
-        // 检查账号状态
-        if (admin.getStatus() == 0) {
-            return Result.error("账号已被禁用");
         }
         
         // 生成Token
@@ -233,12 +247,16 @@ public class AuthServiceImpl implements AuthService {
             token = token.substring(7);
         }
 
-        Long userId = jwtUtil.getUserIdFromToken(token);
-        String role = jwtUtil.getRoleFromToken(token);
+        // 修复：先验证token有效性
         boolean isValid = jwtUtil.validateToken(token);
         if (!isValid) {
             return Result.error(401, "Token无效");
         }
+        
+        // 然后再提取用户信息
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        String role = jwtUtil.getRoleFromToken(token);
+        
         if (userId == null) {
             return Result.error("Token无效");
         }
@@ -292,5 +310,10 @@ public class AuthServiceImpl implements AuthService {
         info.put("avatar", admin.getAvatar());
         info.put("role", "ADMIN");
         return info;
+    }
+
+    @Override
+    public Result logout(String token) {
+        return Result.success("登出成功");
     }
 }

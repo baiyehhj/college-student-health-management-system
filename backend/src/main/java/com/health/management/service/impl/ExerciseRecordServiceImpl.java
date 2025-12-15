@@ -25,6 +25,17 @@ public class ExerciseRecordServiceImpl implements ExerciseRecordService {
     
     @Override
     public Result addRecord(Long studentId, ExerciseRecordRequest request) {
+        // 修复：添加必填字段验证
+        if (request.getRecordDate() == null) {
+            return Result.error("记录日期不能为空");
+        }
+        if (request.getExerciseType() == null || request.getExerciseType().trim().isEmpty()) {
+            return Result.error("运动类型不能为空");
+        }
+        if (request.getDuration() == null || request.getDuration() <= 0) {
+            return Result.error("运动时长必须大于0");
+        }
+        
         ExerciseRecord record = new ExerciseRecord();
         BeanUtils.copyProperties(request, record);
         record.setStudentId(studentId);

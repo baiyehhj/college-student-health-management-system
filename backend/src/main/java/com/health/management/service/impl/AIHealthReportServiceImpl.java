@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -56,8 +57,12 @@ public class AIHealthReportServiceImpl implements AIHealthReportService {
 
     private RestTemplate restTemplate = new RestTemplate();
 
+    @Value("${spring.profiles.active:}")
+    private String activeProfile;
+
     @Override
     public Result generateReport(Long studentId, LocalDate startDate, LocalDate endDate) {
+
         try {
             log.info("开始生成AI健康报告 - 学生ID: {}, 周期: {} 至 {}", studentId, startDate, endDate);
 
@@ -97,7 +102,7 @@ public class AIHealthReportServiceImpl implements AIHealthReportService {
     }
 
     /**
-     * 改进的Coze API调用方法
+     * Coze API调用方法
      * 基于官方SDK的实践优化
      */
     private String callCozeAPIImproved(String prompt) {
@@ -515,7 +520,7 @@ public class AIHealthReportServiceImpl implements AIHealthReportService {
     private String buildPrompt(Map<String, Object> healthData, LocalDate startDate, LocalDate endDate) {
         StringBuilder prompt = new StringBuilder();
 
-        prompt.append("请作为专业的健康顾问，分析以下大学生的健康数据并生成详细报告:\n\n");
+        prompt.append("请作为专业的健康顾问，分析以下大学生的健康数据并根据健康数据生成详细的个性化健康报告，内容包括：综合健康评分、饮食分析及建议、运动分析及建议、睡眠分析及建议、情绪分析及建议、健康风险提示、综合改善建议等\n\n");
         prompt.append("分析周期: ").append(startDate).append(" 至 ").append(endDate).append("\n\n");
 
         // 饮食数据
@@ -593,6 +598,7 @@ public class AIHealthReportServiceImpl implements AIHealthReportService {
             report.setHealthRisks(getStringOrDefault(analysis, "healthRisks", "暂无风险"));
             report.setRecommendations(getStringOrDefault(analysis, "recommendations", "保持良好习惯"));
             report.setAiModelVersion("Coze-1.0");
+            report.setCreateTime(LocalDateTime.now());
 
             // 保存到数据库
             reportMapper.insert(report);

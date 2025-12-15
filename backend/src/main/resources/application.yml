@@ -57,7 +57,7 @@ server:
 
 # JWT配置
 jwt:
-  secret: StudentHealthManagementSystemSecretKey2024
+  secret: StudentHealthManagementSystemSecretKey2025
   expiration: 86400000  # 24小时(毫秒)
   header: Authorization
   prefix: Bearer 
@@ -66,12 +66,12 @@ jwt:
 coze:
   api:
     url: https://api.coze.cn/v3/chat
-    token: pat_bukLAcIcyZHCUWRVudNW9iiryfbbTUas7fDKOtkBFPNDZ47zag5QYTjmJIIxho1S
+    token: pat_DJx0hL6TQxlKV6faPCZ9jhl3wfzoV88U4TxUTJ1CSn9Ca7IDP7JtxPLimR1EqNE5
     bot-id: 7569554814154801206
   food:
     api:
       url: https://api.coze.cn/v3/chat
-      token: pat_bukLAcIcyZHCUWRVudNW9iiryfbbTUas7fDKOtkBFPNDZ47zag5QYTjmJIIxho1S
+      token: pat_DJx0hL6TQxlKV6faPCZ9jhl3wfzoV88U4TxUTJ1CSn9Ca7IDP7JtxPLimR1EqNE5
       bot-id: 7575210805214707764
       file-upload-url: https://api.coze.cn/v1/files/upload
 

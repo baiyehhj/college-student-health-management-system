@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 
+/**
+ * 饮食记录控制器
+ */
 @RestController
 @RequestMapping("/diet")
 @CrossOrigin
@@ -54,7 +57,11 @@ public class DietRecordController {
         return dietRecordService.listRecords(studentId, startDate, endDate, page, size);
     }
     
-    @GetMapping("/daily-stats")
+    /**
+     * 修复：接口路径从 /daily-stats 改为 /stats/daily
+     * 以匹配测试期望的路径格式
+     */
+    @GetMapping("/stats/daily")
     public Result getDailyStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
                                 @RequestHeader("Authorization") String token) {
         Long studentId = getStudentIdFromToken(token);
@@ -65,6 +72,6 @@ public class DietRecordController {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        return jwtUtil.getStudentIdFromToken(token);
+        return jwtUtil.getUserIdFromToken(token);
     }
 }

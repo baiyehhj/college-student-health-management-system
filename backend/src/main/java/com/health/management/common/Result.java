@@ -73,7 +73,8 @@ public class Result {
     public static Result error(Integer code, String message) {
         return new Result(code, message);
     }
-    
+
+
     /**
      * 未授权
      */

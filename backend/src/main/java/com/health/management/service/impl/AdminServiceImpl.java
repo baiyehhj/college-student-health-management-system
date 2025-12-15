@@ -3,13 +3,13 @@ package com.health.management.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.health.management.common.Result;
+import com.health.management.config.PasswordEncoderConfig;
 import com.health.management.entity.*;
 import com.health.management.mapper.*;
 import com.health.management.service.AdminService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +47,7 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AIHealthReportMapper aiHealthReportMapper;
     
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private PasswordEncoderConfig.PasswordEncoder passwordEncoder = new PasswordEncoderConfig.PasswordEncoder();
     
     @Override
     public Result getStudentList(Integer pageNum, Integer pageSize, String keyword, Integer status) {

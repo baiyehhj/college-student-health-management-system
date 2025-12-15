@@ -18,7 +18,12 @@ public interface AuthService {
      * 用户登录
      */
     Result login(LoginRequest request);
-    
+
+    /**
+     * 用户登出
+     */
+    Result logout(String token);
+
     /**
      * 获取当前用户信息
      */

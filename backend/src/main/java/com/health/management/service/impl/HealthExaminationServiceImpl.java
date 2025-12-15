@@ -21,6 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 健康体检服务实现类 - 修复版
+ * 
+ * 修复问题：
+ * 1. 添加必填字段验证（examDate等）
+ * 2. 修复无记录时返回正确状态码
+ */
 @Service
 public class HealthExaminationServiceImpl implements HealthExaminationService {
     
@@ -29,6 +36,27 @@ public class HealthExaminationServiceImpl implements HealthExaminationService {
     
     @Override
     public Result addExamination(Long studentId, HealthExaminationRequest request) {
+
+        if (request.getExamDate() == null) {
+            return Result.error("体检日期不能为空");
+        }
+        if (request.getHeight() == null) {
+            return Result.error("身高不能为空");
+        }
+        if (request.getWeight() == null) {
+            return Result.error("体重不能为空");
+        }
+        
+        // 验证数据范围
+        if (request.getHeight().compareTo(BigDecimal.ZERO) <= 0 || 
+            request.getHeight().compareTo(new BigDecimal("300")) > 0) {
+            return Result.error("身高数据不合理");
+        }
+        if (request.getWeight().compareTo(BigDecimal.ZERO) <= 0 || 
+            request.getWeight().compareTo(new BigDecimal("500")) > 0) {
+            return Result.error("体重数据不合理");
+        }
+        
         HealthExamination examination = new HealthExamination();
         BeanUtils.copyProperties(request, examination);
         examination.setStudentId(studentId);
@@ -128,8 +156,9 @@ public class HealthExaminationServiceImpl implements HealthExaminationService {
         
         HealthExamination examination = healthExaminationMapper.selectOne(wrapper);
         
+        // 修复：无记录时返回404状态码
         if (examination == null) {
-            return Result.success("暂无体检记录", null);
+            return Result.error(404, "暂无体检记录");
         }
         
         Map<String, Object> data = new HashMap<>();
